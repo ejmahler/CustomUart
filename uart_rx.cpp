@@ -48,6 +48,7 @@ ISR(TIMER1_CAPT_vect) {
 ISR(TIMER1_COMPB_vect) {
   const bool rxPinValue = readRx();
   uint8_t localFrameIndex = rxFrameIndex;
+  OCR1B += UartInternal::cyclesPerBit;
 
   if(localFrameIndex == 0) {
     // The first bit is special - if it isn't a 0, we're going to assume that the transmission is finished

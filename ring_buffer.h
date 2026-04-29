@@ -42,9 +42,9 @@ public:
     uint8_t localHead = head;
 
     internalBuffer[localTail] = byte;
-    localTail++;
+    localTail = (localTail + 1) & mask();
     if(localHead == localTail) {
-      head = localHead + 1;
+      head = (localHead + 1) & mask();
     }
 
     tail = localTail;

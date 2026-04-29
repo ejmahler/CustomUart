@@ -22,4 +22,8 @@ namespace uart {
 
   // Reads a byte from the uart rx queue. If the uart rx queue is empty, blocks until a byte is available
   uint8_t readByte();
+
+  // Returns the number of characters currently buffered after being received from uart, and the maximum
+  size_t rxQueueLen();
+  size_t rxMaxQueueLen();
 }

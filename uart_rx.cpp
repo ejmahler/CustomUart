@@ -97,3 +97,13 @@ uint8_t uart::readByte() {
   }
   return result;
 }
+
+size_t uart::rxQueueLen() {
+  noInterrupts();
+  const uint8_t len = rxQueue.len();
+  interrupts();
+  return len;
+}
+size_t uart::rxMaxQueueLen() {
+  return rxQueue.maxLen();
+}

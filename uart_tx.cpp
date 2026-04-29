@@ -1,17 +1,17 @@
 #include <Arduino.h>
 #include "uart.h"
+#include "uart_internal.h"
 #include "pins.h"
 #include "ring_buffer.h"
 
 // ========================================================================================
 // TRANSMIT (aka outgoing)
 // ========================================================================================
-extern uint16_t cyclesPerBit;
 volatile uint16_t txFrame = 0; // The current frame being transmitted. Contains more than 8 bits because we also put the stop bit(s) and parity bit (if configured) in here, and we also use a 1 on the end as a sentinel
 RingBuffer<5> txQueue;
 
 // A transmit is active if OCR1A interrupts are enabled
-bool isTxActive() {
+bool UartInternal::isTxActive() {
   return (TIMSK1 & (1 << OCIE1A)) != 0;
 }
 
@@ -55,7 +55,7 @@ ISR(TIMER1_COMPA_vect) {
     localFrame >>= 1;
   }
   txFrame = localFrame;
-  OCR1A += cyclesPerBit;
+  OCR1A += UartInternal::cyclesPerBit;
 }
 
 size_t uart::tx_nonBlocking(uint8_t* buffer, size_t len) {
@@ -63,7 +63,7 @@ size_t uart::tx_nonBlocking(uint8_t* buffer, size_t len) {
   size_t numPushed = txQueue.pushGreedy(buffer, len);
 
   // If the transmit system is currently idle, start it
-  if(!isTxActive()) {
+  if(!UartInternal::isTxActive()) {
     beginTx();
   }
   interrupts();

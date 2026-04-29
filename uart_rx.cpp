@@ -1,19 +1,18 @@
 #include <Arduino.h>
 #include "uart.h"
+#include "uart_internal.h"
 #include "pins.h"
 #include "ring_buffer.h"
 
 // ========================================================================================
 // RECEIVE (aka incoming)
 // ========================================================================================
-extern uint16_t cyclesPerBit;
-extern uint8_t bitsPerRxFrame;
 volatile uint16_t rxFrame = 0; // The current frame being received. Contains more than 8 bits because we also put the stop bit(s) and parity bit (if configured) in here
 volatile uint8_t rxFrameIndex = 0;
 RingBuffer<5> rxQueue;
 
 // A transmit is active if OCR1B interrupts are enabled
-bool isRxActive() {
+bool UartInternal::isRxActive() {
   return (TIMSK1 & (1 << OCIE1B)) != 0;
 }
 
@@ -26,7 +25,7 @@ void endRx() {
 // Triggers on the falling edge of our RX pin. If we aren't executing an RX, this starts one. If we are, it tweaks the timings to keep up with the sender
 ISR(TIMER1_CAPT_vect) {
   const uint16_t fallTime = ICR1;
-  if(!isRxActive()) {
+  if(!UartInternal::isRxActive()) {
     // enable OCR1B interrupts
     const uint8_t interrupts = TIMSK1;
     TIMSK1 = interrupts | (1 << OCIE1B);
@@ -41,7 +40,7 @@ ISR(TIMER1_CAPT_vect) {
   
   // Schedule the next event half a bit after the falling edge. This will let us sample each bit in the middle of each bit
   // Note that we do this even when we're not starting a new rx! This lets us adapt if the transmitter isn't transmitting at exactly the right baud rate
-  OCR1B = fallTime + cyclesPerBit / 2;
+  OCR1B = fallTime + UartInternal::cyclesPerBit / 2;
 }
 
 // Executes once for each bit we receive
@@ -63,13 +62,13 @@ ISR(TIMER1_COMPB_vect) {
     
     // If haven't received all bits for this frame, just write back
     localFrameIndex++;
-    if(localFrameIndex < bitsPerRxFrame) {
+    if(localFrameIndex < UartInternal::rxBitsPerFrame) {
       rxFrame = localFrame;
       rxFrameIndex = localFrameIndex;
     } else {
       // We've received all bits. Validate and push into the rx buffer
       // If the stop bit isn't 1, discard this frame and shut off the Rx interrupts until it goes high again. This will happen automatically when TIMER1_CAPT_vect triggers
-      if((localFrame & (1 << (bitsPerRxFrame - 1))) == 0) {
+      if((localFrame & (1 << (UartInternal::rxBitsPerFrame - 1))) == 0) {
         endRx();
       } else {
         // This is a valid byte, so push it

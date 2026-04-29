@@ -86,7 +86,7 @@ bool uart::readByte_nonBlocking(uint8_t& outByte) {
   noInterrupts();
   const bool result = rxQueue.pop(outByte);
   interrupts();
-  return outByte;
+  return result;
 }
 
 uint8_t uart::readByte() {

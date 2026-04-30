@@ -7,7 +7,8 @@ uint16_t UartInternal::cyclesPerBit = 0;
 uint8_t UartInternal::rxBitsPerFrame = 10; // 1 start bit, 8 data bits, 1 stop bit
 
 void UartInternal::begin(uint32_t baud) {
-  if(baud < 300) { baud = 300; }
+  // Minimum of 245 baud because we are using a 16-bit timer and below 245, cyclesPerBit doesn't fit in a 16 bit integer
+  if(baud < 245) { baud = 245; }
   UartInternal::cyclesPerBit = F_CPU / baud;
 
   // hold our tx pin high by default

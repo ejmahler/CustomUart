@@ -42,7 +42,7 @@ ISR(TIMER1_COMPA_vect) {
       writeTx(0);
       
       uint8_t nextByte;
-      txQueue.pop(nextByte);
+      txQueue.popNonBlocking(nextByte);
 
       localFrame = static_cast<uint16_t>(nextByte) | 256 | 512; // append stop bit and the sentinel. todo: compute parity, add multiple stop bits, etc
     } else {
@@ -58,7 +58,7 @@ ISR(TIMER1_COMPA_vect) {
   OCR1A += UartInternal::cyclesPerBit;
 }
 
-size_t uart::tx_nonBlocking(uint8_t* buffer, size_t len) {
+size_t UartInternal::tx_nonBlocking(uint8_t* buffer, size_t len) {
   noInterrupts();
   size_t numPushed = txQueue.pushGreedy(buffer, len);
 
@@ -69,7 +69,7 @@ size_t uart::tx_nonBlocking(uint8_t* buffer, size_t len) {
   interrupts();
   return numPushed;
 }
-void uart::tx(uint8_t* buffer, size_t len) {
+void UartInternal::tx(uint8_t* buffer, size_t len) {
   size_t numPushed = tx_nonBlocking(buffer, len);
 
   // Block until everything is queued
@@ -81,16 +81,16 @@ void uart::tx(uint8_t* buffer, size_t len) {
     numPushed = tx_nonBlocking(buffer, len);
   }
 }
-void uart::tx(uint8_t byte) {
+void UartInternal::tx(uint8_t byte) {
   tx(&byte, 1);
 }
 
-size_t uart::txQueueLen() {
+size_t UartInternal::txQueueLen() {
   noInterrupts();
   const uint8_t len = txQueue.len();
   interrupts();
   return len;
 }
-size_t uart::txMaxQueueLen() {
+size_t UartInternal::txMaxQueueLen() {
   return txQueue.maxLen();
 }

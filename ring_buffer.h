@@ -52,7 +52,7 @@ public:
   }
 
   // Attempts to pop an item from the ring buffer. Returns false if the ring buffer is empty
-  bool pop(uint8_t& byte) {
+  bool popNonBlocking(uint8_t& byte) {
     uint8_t localTail = tail;
     uint8_t localHead = head;
 

@@ -2,9 +2,9 @@
 
 This is a software implementation of [UART](https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter) for the Arduino Uno R3, made for the purpose of teaching myself more about Arduino, the ATmega328p, and UART.
 
-The `SoftwareUART.h` header declares a class called `SoftwareUart`. This class inherits from [Print](https://docs.arduino.cc/language-reference/en/functions/communication/print/) and [Stream](https://docs.arduino.cc/language-reference/en/functions/communication/stream/), so it has all the methods you're used to like `readBytesUntil()`, `println()`, etc. It supports full duplex asynchronous communication by using the ATmega328p's hardware Timer1 to generate an interrupt per tx bit and per rx bit. Its rx pin is 8, and its tx pin is 9.
+The `SoftwareUART.h` header declares a class called `SoftwareUart`. This class inherits from [Print](https://docs.arduino.cc/language-reference/en/functions/communication/print/) and [Stream](https://docs.arduino.cc/language-reference/en/functions/communication/stream/), so it has all the methods you're used to like `readBytesUntil()`, `println()`, etc. It supports full duplex asynchronous communication up to 38400 baud, although I recommend a low baud like 4800.
 
-I've measured it successfully communicating up to 38400 baud when executing full duplex communication, and 57600 baud when executing half-duplex communication. I recommend sticking to a very low baud like 4800 though, otherwise you'll spend most of your cpu time transmitting data. The minimum baud is 245.
+It uses pin 8 to receive data, pin 9 to transmit data, and requires the use of the ATmega328p's hardware Timer1 to generate interrupts for sending and receiving bits.
 
 ## Usage
 To see this library in action, try one of the following:

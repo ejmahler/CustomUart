@@ -26,6 +26,6 @@ The tx and rx pins are also fully capable of communicating with Arduino's built-
 1. Wire pin 8 of one Arduino (We'll call it the "main" arduino) to pin 1 of the other ("secondary") Arduino
 1. Wire pin 9 of the main Arduino to pin 0 of the secondary Arduino
 1. Connect a wire directly from pin 8 to pin 9 on your secondary Arduino
-1. Connect a wire from GND of one Arduino to GND of the other Arduino
+1. Connect a wire from GND of the main Arduino to GND of the secondary Arduino
 1. Send messages to the serial monitor of the main Arduino and watch them take a circuitous route to be echoed back to you
 1. Make sure to unplug the secondary Arduino's pin 0 and pin 1 before trying to upload any new programs.

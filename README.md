@@ -4,7 +4,7 @@ This is a software implementation of [UART](https://en.wikipedia.org/wiki/Univer
 
 The `SoftwareUART.h` header declares a class called `SoftwareUart`. This class inherits from [Print](https://docs.arduino.cc/language-reference/en/functions/communication/print/) and [Stream](https://docs.arduino.cc/language-reference/en/functions/communication/stream/), so it has all the methods you're used to like `readBytesUntil()`, `println()`, etc. It supports full duplex asynchronous communication up to 38400 baud, although I recommend a low baud like 4800.
 
-It uses pin 8 to receive data, pin 9 to transmit data, and requires the use of the ATmega328p's hardware Timer1 to generate interrupts for sending and receiving bits.
+It uses pin 8 to receive data, pin 9 to transmit data, and internally uses ATmega328p's hardware Timer1 to generate interrupts for sending and receiving bits.
 
 ## Usage
 To see this library in action, try one of the following:

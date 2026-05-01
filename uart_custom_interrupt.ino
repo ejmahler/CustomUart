@@ -1,19 +1,20 @@
-#include "uart_internal.h"
+#include "SoftwareUart.h"
+
+SoftwareUart uart;
 
 void setup() {
-  UartInternal::begin(4800);
+  uart.begin(4800);
   Serial.begin(4800);
 }
 
 void loop() {
   // echo anything we get on our serial over our custom uart connection
   while(Serial.available()) {
-    UartInternal::tx(Serial.read());
+    uart.write(Serial.read());
   }
 
   // echo anything we get from uart over our our serial connection
-  uint8_t rxByte;
-  while(UartInternal::readByte_nonBlocking(rxByte)) {
-    Serial.write(rxByte);
+  while(uart.available()) {
+    Serial.write(uart.read());
   }
 }

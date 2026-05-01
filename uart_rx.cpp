@@ -82,19 +82,16 @@ ISR(TIMER1_COMPB_vect) {
   }
 }
 
-bool UartInternal::readByte_nonBlocking(uint8_t& outByte) {
+bool UartInternal::readNonBlocking(uint8_t& outByte) {
   noInterrupts();
   const bool result = rxQueue.popNonBlocking(outByte);
   interrupts();
   return result;
 }
-
-uint8_t UartInternal::readByte() {
-  uint8_t result;
-  while(!readByte_nonBlocking(result)) {
-    // todo: this isn't safe - if an interrupt pushes a byte right now, between these two lines, we'll miss this byte! Not a catastrophe because when a second byte gets pushed we'll catch up, but could definitely be improved
-    rxQueue.waitForTailChange();
-  }
+bool UartInternal::peekNonBlocking(uint8_t& outByte) {
+  noInterrupts();
+  const bool result = rxQueue.peekNonBlocking(outByte);
+  interrupts();
   return result;
 }
 

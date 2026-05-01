@@ -16,7 +16,7 @@ public:
   constexpr uint8_t maxLen() const { return INTERNAL_BUFFER_LEN - 1; }
 
   // Pushes as many as possible from the provided buffer into the ring buffer. Returns how many were pushed.
-  size_t pushGreedy(uint8_t* buffer, size_t len) {
+  size_t pushNonBlocking(uint8_t* buffer, size_t len) {
     uint8_t copied = 0;
 
     // move variables local so they can sit in registers instead of having to be loaded every time
@@ -48,7 +48,26 @@ public:
     }
 
     tail = localTail;
-    ;
+  }
+
+  // Pushes a single byte into the queue. If the queue is full, blocks until room is available. Do not call while interrupts are disabled.
+  void pushBlocking(uint8_t byte) {
+    while(true) {
+      noInterrupts();
+      // move variables local so they can sit in registers instead of having to be loaded every time
+      uint8_t localTail = tail;
+      uint8_t localHead = head;
+      if(localHead != localTail) {
+        internalBuffer[localTail] = byte;
+        localTail = (localTail + 1) & mask();
+        tail = localTail;
+        interrupts();
+        break;
+      } else {
+        interrupts();
+        while(head == localHead) {} // Wait until room becomes available
+      }
+    }
   }
 
   // Attempts to pop an item from the ring buffer. Returns false if the ring buffer is empty
@@ -64,17 +83,16 @@ public:
       return false;
     }
   }
+  bool peekNonBlocking(uint8_t& byte) {
+    uint8_t localTail = tail;
+    uint8_t localHead = head;
 
-  // Blocks until the head of the queue changes. Do not call while interrupts are disabled
-  void waitForHeadChange() const { 
-    const uint8_t startHead = head;
-    while(head == startHead) {}
-  }
-
-  // Pops an item from the ring buffer. If the queue is empty, blocks until something is available
-  void waitForTailChange() const { 
-    const uint8_t startTail = tail;
-    while(tail == startTail) {}
+    if(localTail != localHead) {
+      byte = internalBuffer[localHead];
+      return true;
+    } else {
+      return false;
+    }
   }
 private:
   constexpr static uint8_t mask() { return INTERNAL_BUFFER_LEN - 1; }

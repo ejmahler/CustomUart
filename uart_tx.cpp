@@ -58,9 +58,9 @@ ISR(TIMER1_COMPA_vect) {
   OCR1A += UartInternal::cyclesPerBit;
 }
 
-size_t UartInternal::tx_nonBlocking(uint8_t* buffer, size_t len) {
+size_t UartInternal::txNonBlocking(const uint8_t* buffer, size_t len) {
   noInterrupts();
-  size_t numPushed = txQueue.pushGreedy(buffer, len);
+  size_t numPushed = txQueue.pushNonBlocking(buffer, len);
 
   // If the transmit system is currently idle, start it
   if(!UartInternal::isTxActive()) {
@@ -69,20 +69,14 @@ size_t UartInternal::tx_nonBlocking(uint8_t* buffer, size_t len) {
   interrupts();
   return numPushed;
 }
-void UartInternal::tx(uint8_t* buffer, size_t len) {
-  size_t numPushed = tx_nonBlocking(buffer, len);
+void UartInternal::txBlocking(const uint8_t* buffer, size_t len) {
+  // Push as many bytes as we can at once
+  size_t numPushed = txNonBlocking(buffer, len);
 
-  // Block until everything is queued
-  while(numPushed < len) {
-    len -= numPushed;
-    buffer += numPushed;
-    // todo: this isn't safe - if an interrupt pops a byte right now, right before this next line, we'll miss this byte! Not a catastrophe because when a second byte gets popped we'll catch up, but could definitely be improved
-    txQueue.waitForHeadChange();
-    numPushed = tx_nonBlocking(buffer, len);
+  // For whatever's left, push byte by byte. Note that we're assuming we can push bytes faster than they're depleted from the queue. If that assumption were to fail and the queue starved, it would shut off 
+  for(size_t i = numPushed; i < len; i++) {
+    txQueue.pushBlocking(buffer[i]);
   }
-}
-void UartInternal::tx(uint8_t byte) {
-  tx(&byte, 1);
 }
 
 size_t UartInternal::txQueueLen() {

@@ -19,7 +19,7 @@ Alternatively, you can use 2 Arduinos running the same program:
 1. Wire pin 8 of each Arduino to pin 9 of the other Arduino
 1. Connect a wire from GND of one Arduino to GND of the other Arduino
 1. Open CustomUart.ino in two instances of the Arduino IDE, each connected to a different physical Arduino
-1. Send messages to the serial monitor connected to one arduino and see them appear in the serial monitor connected to the other Arduino
+1. Send messages to the serial monitor connected to one Arduino and see them appear in the serial monitor connected to the other Arduino
 
 The tx and rx pins are also fully capable of communicating with Arduino's built-in UART pins 0 and 1, but testing that will be more complicated since it'll interfere with uploading programs and will interfere with the serial monitor.
 1. Upload the program to both Arduinos before connecting any wires

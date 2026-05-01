@@ -4,7 +4,7 @@ This is a software implementation of UART for the Arduino Uno R3, made for the p
 
 The SoftwareUART.h header declares a class called SoftwareUart. This class inherits from Print and Stream, so it has all the methods you're used to like ReadBytesUntil(), println(), etc. It supports full duplex asynchronous communication by using the ATmega328p's hardware Timer1 to generate an interrupt per tx bit and per rx bit. Its rx pin is 8, and its tx pin is 9.
 
-I've measured it successfully communicating up to 38400 baud when executing full duplex communication, and 57600 baud when executing half-duplex communication. I recommend sticking to a very low baud like 4800 though, otherwise you'll spend most of your cpu time transmitting data.
+I've measured it successfully communicating up to 38400 baud when executing full duplex communication, and 57600 baud when executing half-duplex communication. I recommend sticking to a very low baud like 4800 though, otherwise you'll spend most of your cpu time transmitting data. The minimum baud is 245.
 
 ## Usage
 To see this library in action, try one of the following:

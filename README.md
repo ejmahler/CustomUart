@@ -23,7 +23,7 @@ Alternatively, you can use 2 Arduinos running the same program:
 
 The tx and rx pins are also fully capable of communicating with Arduino's built-in UART pins 0 and 1, but testing that will be more complicated since it'll interfere with uploading programs and will interfere with the serial monitor.
 1. Upload the program to both Arduinos before connecting any wires
-1. Wire pin 8 of one Arduino (Well call it the "main" arduino) to pin 1 of the other ("secondary") Arduino
+1. Wire pin 8 of one Arduino (We'll call it the "main" arduino) to pin 1 of the other ("secondary") Arduino
 1. Wire pin 9 of the main Arduino to pin 0 of the secondary Arduino
 1. Connect a wire directly from pin 8 to pin 9 on your secondary Arduino
 1. Connect a wire from GND of one Arduino to GND of the other Arduino

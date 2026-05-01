@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include "uart.h"
 #include "uart_internal.h"
 #include "pins.h"
 #include "ring_buffer.h"
